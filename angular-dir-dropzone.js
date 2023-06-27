@@ -34,7 +34,7 @@
 			link: function($scope, iElm, iAttrs, controller) {
 
 				iElm.dropzone({
-					url: iAttrs.UPLOAD_URL,
+					url: iAttrs.uploadUrl,
 					method: 'post',
 					uploadMultiple: false,
 					clickable: true,
