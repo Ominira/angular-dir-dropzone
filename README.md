@@ -17,6 +17,7 @@ write html template directive as such
 
 ###### for you again Brian :)
 
+the below was curled from the ```login.html``` with a page embedded ```js``` declared ```<script type="module">```
 ```js
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
