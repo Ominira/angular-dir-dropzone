@@ -248,3 +248,113 @@ angular.module('ejournalApp')
 
   });
 ```
+the app.js
+```js
+'use strict';
+
+/**
+ * @ngdoc overview
+ * @name ejournalApp
+ * @description
+ * # ejournalApp
+ *
+ * Main module of the application.
+ */
+angular
+  .module('ejournalApp', [
+    'ngAnimate',
+    'ngAria',
+    'ngCookies',
+    'ngMessages',
+    'ngResource',
+    'ngRoute',
+    'ngSanitize',
+    'ngTouch',
+    'ngMaterial',
+    'angularUtils.directives.dirPagination'
+  ])
+  .config(function ($routeProvider) {
+    $routeProvider
+      .when('/', {
+        templateUrl: 'views/main.html',
+        controller: 'MainCtrl',
+        controllerAs: 'main',
+        isLogin: false
+      })
+      .when('/about', {
+        templateUrl: 'views/about.html',
+        controller: 'AboutCtrl',
+        controllerAs: 'about',
+        isLogin: false
+      })
+      .when('/login', {
+        templateUrl: 'views/login.html',
+        controller: 'LoginCtrl',
+        controllerAs: 'login',
+        isLogin: true
+      })
+      .when('/receipt/:transaction', {
+        templateUrl: 'views/receipt.html',
+        controller: 'ReceiptCtrl',
+        controllerAs: 'receipt',
+        isLogin: false
+      })
+      .otherwise({
+        redirectTo: '/'
+      });
+  })
+  .config(function ($mdThemingProvider) {
+    $mdThemingProvider.theme('default')
+      .primaryPalette('orange')
+      .accentPalette('green')
+      .dark();
+  })
+  // .config(function ($mdDateLocaleProvider) {
+  //   $mdDateLocaleProvider.formatDate = function (date) {
+  //     return moment(date).format('yyyy/MM/DD');
+  //   };
+  //   $mdDateLocaleProvider.parseDate = function (dateString) {
+  //     var m = moment(dateString, 'yyyy/MM/DD', true);
+  //     return m.isValid() ? m.toDate() : new Date(NaN);
+  //   };
+  // })
+  .run(function ($rootScope, $location, eJournalAppService, $log) {
+    $rootScope.goTo = function (where) {
+      if (where) {
+        $location.path('/' + where);
+      }
+    };
+
+    if (_.isEmpty(eJournalAppService.getAccountSession())) {
+      $rootScope.goTo('login');
+    } else {
+      $rootScope.account = eJournalAppService.getAccountSession();
+    }
+
+    $rootScope.$on('$routeChangeSuccess', function (event, current, previous) {
+      $rootScope.isLogin = current.isLogin;
+    });
+
+    $rootScope.$on('$routeChangeStart', function (event, next) {
+      if (_.isEmpty(eJournalAppService.getAccountSession())) {
+        $rootScope.goTo('login');
+      }
+
+      if (next.controllerAs === 'login' && !_.isEmpty(eJournalAppService.getAccountSession())) {
+        $rootScope.goTo('/');
+      }
+      //$rootScope.isLogin = next.isLogin;
+    });
+
+    $rootScope.isActive = function (route) {
+      return $location.path() === route;
+    };
+
+    $rootScope.doLogout = function () {
+      //$rootScope.isLogin = true;
+      $rootScope.account = {};
+      eJournalAppService.deleteAccountSession();
+      $rootScope.goTo('login');
+    };
+  });
+```
